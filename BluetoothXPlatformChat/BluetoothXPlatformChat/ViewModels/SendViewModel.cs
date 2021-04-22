@@ -9,70 +9,49 @@ namespace BluetoothXPlatformChat.ViewModels
     public class SendViewModel : BaseViewModel
     {
         private readonly ISenderBluetoothService _senderBluetoothService;
-        private string _data = "TestMessage";
-        private Device _selectDevice;
         private string _resultValue;
 
-        /// <summary>  
-        /// Initializes a new instance of the <see cref="SenderViewModel"/> class.  
-        /// </summary>  
-        /// <param name="senderBluetoothService">  
-        /// The Sender bluetooth service.  
-        /// </param>  
         public SendViewModel(ISenderBluetoothService senderBluetoothService)
         {
             Title = "Send";
             _senderBluetoothService = senderBluetoothService;
             ResultValue = "N/D";
-            SendCommand = new RelayCommand(
-                SendData,
-                () => !string.IsNullOrEmpty(Data) && SelectDevice != null && SelectDevice.DeviceInfo != null);
             Devices = new ObservableCollection<Device>
-        {
-            new Device(null) { DeviceName = "Searching..." }
-        };
+            {
+                new Device(null) { DeviceName = "Searching..." }
+            };
             Messenger.Default.Register<Message>(this, ShowDevice);
         }
 
-        /// <summary>  
-        /// Gets or sets the devices.  
-        /// </summary>  
-        /// <value>  
-        /// The devices.  
-        /// </value>  
         public ObservableCollection<Device> Devices
         {
             get; set;
         }
 
-        /// <summary>  
-        /// Gets or sets the select device.  
-        /// </summary>  
-        /// <value>  
-        /// The select device.  
-        /// </value>  
-        public Device SelectDevice
+        private Device _selectedDevice;
+        public Device SelectedDevice
         {
-            get => _selectDevice;
+            get => _selectedDevice;
             set
             {
-                if (Set(ref _selectDevice, value))
+                if (Set(ref _selectedDevice, value))
                 {
                     this.SendCommand.RaiseCanExecuteChanged();
                 }
             }
         }
 
-        /// <summary>  
-        /// Gets or sets the data.  
-        /// </summary>  
-        /// <value>  
-        /// The data.  
-        /// </value>  
+        private string _data = "";
         public string Data
         {
             get => _data;
-            set => Set(ref _data, value);
+            set
+            {
+                if (Set(ref _data, value))
+                {
+                    SendCommand.RaiseCanExecuteChanged();
+                }
+            }
         }
 
         /// <summary>  
@@ -87,18 +66,29 @@ namespace BluetoothXPlatformChat.ViewModels
             set { Set(ref _resultValue, value); }
         }
 
+        private RelayCommand _sendCommand;
         /// <summary>  
         /// Gets the send command.  
         /// </summary>  
         /// <value>  
         /// The send command.  
         /// </value>  
-        public RelayCommand SendCommand { get; private set; }
+        public RelayCommand SendCommand
+        {
+            get
+            {
+                return _sendCommand
+                    ?? (_sendCommand = new RelayCommand(
+                        SendData,
+                        () => !string.IsNullOrEmpty(Data) && SelectedDevice != null && SelectedDevice.DeviceInfo != null));
+            }
+
+        }
 
         private async void SendData()
         {
             ResultValue = "N/D";
-            var wasSent = await _senderBluetoothService.Send(SelectDevice, Data);
+            var wasSent = await _senderBluetoothService.Send(SelectedDevice, Data);
             if (wasSent)
             {
                 ResultValue = "The data was sent.";
@@ -123,7 +113,7 @@ namespace BluetoothXPlatformChat.ViewModels
                 {
                     Devices.Add(item);
                 }
-                Data = string.Empty;
+                SendCommand.RaiseCanExecuteChanged();
             }
         }
     }

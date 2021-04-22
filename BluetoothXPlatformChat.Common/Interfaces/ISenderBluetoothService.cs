@@ -1,4 +1,5 @@
-﻿using BluetoothXPlatformChat.Common.Model;
+﻿using System;
+using BluetoothXPlatformChat.Common.Model;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

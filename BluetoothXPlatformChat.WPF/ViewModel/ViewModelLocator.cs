@@ -12,8 +12,9 @@
   See http://www.galasoft.ch/mvvm
 */
 
+using System;
 using BluetoothXPlatformChat.Common.Interfaces;
-using BluetoothXPlatformChat.Common.Services;
+using BluetoothXPlatformChat.WPF.Services;
 using CommonServiceLocator;
 using GalaSoft.MvvmLight.Ioc;
 
@@ -80,7 +81,10 @@ namespace BluetoothXPlatformChat.WPF.ViewModel
         /// </summary>  
         public static void Cleanup()
         {
-            // TODO Clear the ViewModels  
+            foreach (IReceiverBluetoothService disposable in ServiceLocator.Current.GetAllInstances<IReceiverBluetoothService>())
+            {
+                disposable.Dispose();
+            }
         }
     }
 }

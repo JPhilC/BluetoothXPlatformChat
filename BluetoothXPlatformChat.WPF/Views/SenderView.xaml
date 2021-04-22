@@ -17,7 +17,7 @@
                  Margin="0,20,0,0"  
                  HorizontalAlignment="Left"  
                  ItemsSource="{Binding Devices}"  
-                 SelectedItem="{Binding SelectDevice}" />
+                 SelectedItem="{Binding SelectedDevice}" />
         <TextBlock Margin="0,20,0,0" Text="Write the data to send:" />
         <TextBox Margin="0,20,20,0" Text="{Binding Data, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Button Width="80"  

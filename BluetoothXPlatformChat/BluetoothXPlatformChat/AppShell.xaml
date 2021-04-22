@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Shell xmlns="http://xamarin.com/schemas/2014/forms" 
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-       xmlns:local="clr-namespace:BluetoothXPlatformChat.Views"
+       xmlns:vw="clr-namespace:BluetoothXPlatformChat.Views;assembly=BluetoothXPlatformChat"
        Title="Bluetooth Chat"
        x:Class="BluetoothXPlatformChat.AppShell">
 
@@ -30,8 +30,8 @@
     </Shell.Resources>
 
     <TabBar>
-        <ShellContent Title="Send" Icon="icons8-sort-up-32.png" Route="SendPage" ContentTemplate="{DataTemplate local:SendPage}" />
-        <ShellContent Title="Receive" Icon="icons8-sort-down-32.png" ContentTemplate="{DataTemplate local:ReceivePage}" />
+        <ShellContent Title="Send" Icon="icons8-sort-up-32.png" Route="SendPage" ContentTemplate="{DataTemplate vw:SendPage}" />
+        <ShellContent Title="Receive" Icon="icons8-sort-down-32.png" ContentTemplate="{DataTemplate vw:ReceivePage}" />
     </TabBar>
 
 </Shell>

@@ -1,12 +1,6 @@
-﻿using BluetoothXPlatformChat.ViewModels;
-using BluetoothXPlatformChat.Views;
-using System;
-using System.Collections.Generic;
-using Xamarin.Forms;
-
-namespace BluetoothXPlatformChat
+﻿namespace BluetoothXPlatformChat
 {
-    public partial class AppShell : Xamarin.Forms.Shell
+    public partial class AppShell
     {
         public AppShell()
         {

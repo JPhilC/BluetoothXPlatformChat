@@ -1,4 +1,4 @@
-﻿using BluetoothXPlatformChat.Services;
+﻿using BluetoothXPlatformChat.Common.Interfaces;
 using Xamarin.Forms;
 
 namespace BluetoothXPlatformChat
@@ -9,8 +9,6 @@ namespace BluetoothXPlatformChat
         public App()
         {
             InitializeComponent();
-
-            DependencyService.Register<MockDataStore>();
             MainPage = new AppShell();
         }
 
@@ -24,6 +22,15 @@ namespace BluetoothXPlatformChat
 
         protected override void OnResume()
         {
+        }
+
+        protected override void CleanUp()
+        {
+            // The send and receive services are both disposable (they hold on to the bluetooth client)
+            // so need cleaning up.
+            IReceiverBluetoothService receiverService = DependencyService.Get<IReceiverBluetoothService>();
+            receiverService.Dispose();
+            base.CleanUp();
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using BluetoothXPlatformChat.Common.Interfaces;
 using BluetoothXPlatformChat.Common.Model;
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 
@@ -10,34 +9,15 @@ namespace BluetoothXPlatformChat.ViewModels
     {
         private readonly IReceiverBluetoothService _receiverBluetoothService;
         private string _data;
-        private bool _isStarEnabled;
         private string _status;
 
-        /// <summary>  
-        /// Initializes a new instance of the <see cref="ReceiverViewModel" /> class.  
-        /// </summary>  
-        /// <param name="receiverBluetoothService">The Receiver bluetooth service.</param>  
         public ReceiveViewModel(IReceiverBluetoothService receiverBluetoothService)
         {
             Title = "Receive";
             _receiverBluetoothService = receiverBluetoothService;
             _receiverBluetoothService.PropertyChanged += ReceiverBluetoothService_PropertyChanged;
-            IsStarEnabled = true;
             Data = "N/D";
             Status = "N/D";
-            StartCommand = new RelayCommand(() =>
-            {
-                _receiverBluetoothService.Start(SetData);
-                IsStarEnabled = false;
-                Data = "Can receive data.";
-            });
-
-            StopCommand = new RelayCommand(() =>
-            {
-                _receiverBluetoothService.Stop();
-                IsStarEnabled = true;
-                Data = "Cannot receive data.";
-            });
 
             Messenger.Default.Register<Message>(this, ResetAll);
         }
@@ -54,7 +34,7 @@ namespace BluetoothXPlatformChat.ViewModels
                 {
                     _receiverBluetoothService.Stop();
                 }
-                IsStarEnabled = true;
+                IsListening = false;
                 Data = "N/D";
                 Status = "N/D";
             }
@@ -79,9 +59,11 @@ namespace BluetoothXPlatformChat.ViewModels
         /// </value>  
         public string Data
         {
-            get { return _data; }
-            set { Set(ref _data, value); }
+            get => _data;
+            set => Set(ref _data, value);
         }
+
+        private RelayCommand _startCommand;
 
         /// <summary>  
         /// Gets the start command.  
@@ -89,51 +71,55 @@ namespace BluetoothXPlatformChat.ViewModels
         /// <value>  
         /// The start command.  
         /// </value>  
-        public RelayCommand StartCommand { get; private set; }
+        public RelayCommand StartCommand
+        {
+            get
+            {
+                return _startCommand
+                       ?? (_startCommand = new RelayCommand(() =>
+                       {
+                           _receiverBluetoothService.Start(SetData);
+                           Data = "Can receive data.";
+                       }, () => !IsListening));
+            } 
 
+        }
+
+        private RelayCommand _stopCommand;
         /// <summary>  
         /// Gets the stop command.  
         /// </summary>  
         /// <value>  
         /// The stop command.  
         /// </value>  
-        public RelayCommand StopCommand { get; private set; }
+        public RelayCommand StopCommand
+        {
+            get
+            {
+                return _stopCommand
+                    ?? (_stopCommand = new RelayCommand(() =>
+                    {
+                        _receiverBluetoothService.Stop();
+                        Data = "Cannot receive data.";
+                    }, () => IsListening));
+            }
+        }
 
+        private bool _isListening;
         /// <summary>  
-        /// Gets or sets a value indicating whether is star enabled.  
+        /// Gets or sets a value indicating whether the app is listening.  
         /// </summary>  
         /// <value>  
         /// The is star enabled.  
         /// </value>  
-        public bool IsStarEnabled
+        public bool IsListening
         {
-            get
-            {
-                return _isStarEnabled;
-            }
+            get => _isListening;
             set
             {
-                Set(ref _isStarEnabled, value);
-                RaisePropertyChanged("IsStopEnabled");
-            }
-        }
-
-        /// <summary>  
-        /// Gets or sets a value indicating whether is stop enabled.  
-        /// </summary>  
-        /// <value>  
-        /// The is stop enabled.  
-        /// </value>  
-        public bool IsStopEnabled
-        {
-            get
-            {
-                return !_isStarEnabled;
-            }
-            set
-            {
-                Set(ref _isStarEnabled, !value);
-                RaisePropertyChanged("IsStarEnabled");
+                Set(ref _isListening, value);
+                StartCommand.RaiseCanExecuteChanged();
+                StopCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -143,8 +129,8 @@ namespace BluetoothXPlatformChat.ViewModels
         /// <value>The status.</value>  
         public string Status
         {
-            get { return _status; }
-            set { Set(ref _status, value); }
+            get => _status;
+            set => Set(ref _status, value);
         }
 
         /// <summary>  
@@ -156,7 +142,7 @@ namespace BluetoothXPlatformChat.ViewModels
         {
             if (e.PropertyName == "WasStarted")
             {
-                IsStarEnabled = true;
+                IsListening = _receiverBluetoothService.WasStarted;
             }
         }
     }

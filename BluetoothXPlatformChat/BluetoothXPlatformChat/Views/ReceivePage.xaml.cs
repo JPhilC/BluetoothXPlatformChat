@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BluetoothXPlatformChat.Common.Interfaces;
+﻿using BluetoothXPlatformChat.Common.Interfaces;
 using BluetoothXPlatformChat.ViewModels;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -11,16 +6,13 @@ using Xamarin.Forms.Xaml;
 namespace BluetoothXPlatformChat.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class ReceivePage : ContentPage
+    public partial class ReceivePage
     {
-        private IReceiverBluetoothService _service;
-        private ReceiveViewModel _viewModel;
-
         public ReceivePage()
         {
-            //_service = DependencyService.Get<IReceiverBluetoothService>();
-            //_viewModel = new ReceiveViewModel(_service);
-
+            IReceiverBluetoothService service = DependencyService.Get<IReceiverBluetoothService>();
+            ReceiveViewModel viewModel = new ReceiveViewModel(service);
+            this.BindingContext = viewModel;
             InitializeComponent();
         }
     }

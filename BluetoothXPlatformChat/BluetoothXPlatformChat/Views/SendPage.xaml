@@ -3,12 +3,20 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BluetoothXPlatformChat.Views.SendPage"
              Title="{Binding Title}">
-    <!--BindingContext="{Binding SendViewModel, Source={StaticResource Locator}}"-->
-    <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Welcome to Xamarin.Forms!"
+    <StackLayout>
+        <Label Text="Available Devices"
                 VerticalOptions="CenterAndExpand" 
                 HorizontalOptions="CenterAndExpand" />
-        </StackLayout>
-    </ContentPage.Content>
+        <ListView ItemsSource="{Binding Devices}"
+                      SelectedItem="{Binding SelectedDevice}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextCell Text="{Binding DeviceName}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <Entry Text="{Binding Data}" Placeholder="Enter text to send"/>
+        <Button Text="Send" Command="{Binding SendCommand}" />
+        <Label Text ="{Binding ResultValue}" />
+    </StackLayout>
 </ContentPage>

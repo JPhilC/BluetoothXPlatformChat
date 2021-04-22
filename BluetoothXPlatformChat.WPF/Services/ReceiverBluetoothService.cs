@@ -9,7 +9,7 @@ using BluetoothXPlatformChat.Common;
 
 namespace BluetoothXPlatformChat.WPF.Services
 {
-    public class ReceiverBluetoothService : ObservableObject, IDisposable, IReceiverBluetoothService
+    public class ReceiverBluetoothService : ObservableObject, IReceiverBluetoothService
     {
         private Action<string> _responseAction;
         private BluetoothListener _listener;

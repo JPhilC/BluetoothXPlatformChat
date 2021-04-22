@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using BluetoothXPlatformChat.Models;
-using BluetoothXPlatformChat.Services;
-using GalaSoft.MvvmLight;
-using Xamarin.Forms;
+﻿using GalaSoft.MvvmLight;
 
 namespace BluetoothXPlatformChat.ViewModels
 {
     public class BaseViewModel : ViewModelBase
     {
-        public IDataStore<Item> DataStore => DependencyService.Get<IDataStore<Item>>();
 
         bool _isBusy;
         public bool IsBusy

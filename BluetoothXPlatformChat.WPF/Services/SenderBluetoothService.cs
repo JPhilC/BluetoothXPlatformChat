@@ -9,7 +9,7 @@ using BluetoothXPlatformChat.Common;
 
 namespace BluetoothXPlatformChat.WPF.Services
 {
-    public sealed class SenderBluetoothService : ISenderBluetoothService
+    public class SenderBluetoothService : ISenderBluetoothService
     {
         /// <summary>  
         /// Gets the devices.  
@@ -23,7 +23,7 @@ namespace BluetoothXPlatformChat.WPF.Services
                 var devices = new List<Device>();
                 using (var bluetoothClient = new BluetoothClient())
                 {
-                    var array = bluetoothClient.DiscoverDevices().ToArray();
+                    var array = bluetoothClient.DiscoverDevices(21).ToArray();
                     var count = array.Length;
                     for (var i = 0; i < count; i++)
                     {
@@ -56,39 +56,46 @@ namespace BluetoothXPlatformChat.WPF.Services
             // for not block the UI it will run in a different threat  
             var task = Task.Run(() =>
             {
-                using (var bluetoothClient = new BluetoothClient())
+                try
                 {
-                    try
+                    using (BluetoothClient bluetoothClient = new BluetoothClient())
                     {
                         // connecting  
                         bluetoothClient.Connect(device.DeviceInfo.DeviceAddress, Constants.ServiceClassId);
-                        // bluetoothClient.Connect(device.DeviceInfo.DeviceAddress, BluetoothService.SerialPort);
+
 
                         // get stream for send the data  
-                        var bluetoothStream = bluetoothClient.GetStream();
-
-                        // if all is ok to send  
-                        if (bluetoothClient.Connected && bluetoothStream != null)
+                        using (var bluetoothStream = bluetoothClient.GetStream())
                         {
-                            // write the data in the stream  
-                            var buffer = System.Text.Encoding.UTF8.GetBytes(content);
-                            bluetoothStream.Write(buffer, 0, buffer.Length);
-                            bluetoothStream.Flush();
-                            bluetoothStream.Close();
-                            return true;
+
+                            // if all is ok to send  
+                            if (bluetoothClient.Connected && bluetoothStream != null)
+                            {
+                                // write the data in the stream  
+                                var buffer = System.Text.Encoding.UTF8.GetBytes(content);
+                                bluetoothStream.Write(buffer, 0, buffer.Length);
+                                bluetoothStream.Flush();
+                                bluetoothStream.Close();
+                                return true;
+                            }
+
+                            return false;
                         }
-                        return false;
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Debug.WriteLine(ex.Message);
-                        // the error will be ignored and the send data will report as not sent  
-                        // for understood the type of the error, handle the exception  
                     }
                 }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                    // the error will be ignored and the send data will report as not sent  
+                    // for understood the type of the error, handle the exception  
+                }
+
                 return false;
             });
             return await task;
         }
-    }
+
+     }
+
+
 }

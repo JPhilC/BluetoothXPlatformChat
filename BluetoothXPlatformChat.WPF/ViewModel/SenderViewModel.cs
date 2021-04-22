@@ -11,7 +11,7 @@ namespace BluetoothXPlatformChat.WPF.ViewModel
     {
         private readonly ISenderBluetoothService _senderBluetoothService;
         private string _data;
-        private Device _selectDevice;
+        private Device _selectedDevice;
         private string _resultValue;
 
         /// <summary>  
@@ -26,7 +26,7 @@ namespace BluetoothXPlatformChat.WPF.ViewModel
             ResultValue = "N/D";
             SendCommand = new RelayCommand(
                 SendData,
-                () => !string.IsNullOrEmpty(Data) && SelectDevice != null && SelectDevice.DeviceInfo != null);
+                () => !string.IsNullOrEmpty(Data) && SelectedDevice != null && SelectedDevice.DeviceInfo != null);
             Devices = new ObservableCollection<Device>
         {
             new Device(null) { DeviceName = "Searching..." }
@@ -51,12 +51,12 @@ namespace BluetoothXPlatformChat.WPF.ViewModel
         /// <value>  
         /// The select device.  
         /// </value>  
-        public Device SelectDevice
+        public Device SelectedDevice
         {
-            get { return _selectDevice; }
+            get { return _selectedDevice; }
             set
             {
-                if (Set(ref _selectDevice, value))
+                if (Set(ref _selectedDevice, value))
                 {
                     this.SendCommand.RaiseCanExecuteChanged();
                 }
@@ -98,7 +98,7 @@ namespace BluetoothXPlatformChat.WPF.ViewModel
         private async void SendData()
         {
             ResultValue = "N/D";
-            var wasSent = await _senderBluetoothService.Send(SelectDevice, Data);
+            var wasSent = await _senderBluetoothService.Send(SelectedDevice, Data);
             if (wasSent)
             {
                 ResultValue = "The data was sent.";
