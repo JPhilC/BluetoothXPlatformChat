@@ -1,0 +1,71 @@
+﻿<UserControl x:Class="BluetoothXPlatformChat.WPF.Views.CommandView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             DataContext="{Binding CommandViewModel, Source={StaticResource Locator}}" 
+             mc:Ignorable="d" 
+             d:DesignHeight="400" d:DesignWidth="400"
+             MaxWidth="600">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="5" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="5" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="5" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="5" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="5" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="5" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="5" />
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5">Command Generator</TextBlock>
+        <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5">Select one device:</TextBlock>
+        <ListBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5"
+                 Width="150"
+                 MaxHeight="100"  
+                 HorizontalAlignment="Left"  
+                 ItemsSource="{Binding Devices}"  
+                 SelectedItem="{Binding SelectedDevice}" />
+        <Grid Grid.Row="4" Grid.Column="6">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="5" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="5" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Button Grid.Row="0" Content="Refresh" Command="{Binding RefreshDevicesCommand}" />
+            <Button Grid.Row="2" Content="Connect" Command="{Binding ConnectCommand}" />
+            <Button Grid.Row="4" Content="Disconnect" Command="{Binding DisconnectCommand}" />
+
+        </Grid>
+        <TextBlock Grid.Row="6" Grid.Column="0" Text="Command:" />
+        <TextBox   Grid.Row="6" Grid.Column="2" Width="80"
+                   Text="{Binding Data, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <Button Grid.Row="6" Grid.Column="6" Width="80"  
+                Command="{Binding SendCommand}"  
+                Content="Send" />
+        <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="5">  
+            Result:
+        </TextBlock>
+        <ScrollViewer Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="7" >
+            <TextBlock TextWrapping="Wrap" MinHeight="100" Text="{Binding Response}"/>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

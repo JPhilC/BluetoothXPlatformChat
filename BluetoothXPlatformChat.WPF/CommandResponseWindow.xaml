@@ -1,0 +1,30 @@
+﻿<Window x:Class="BluetoothXPlatformChat.WPF.CommandResponseWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:BluetoothXPlatformChat.WPF.Views"
+        DataContext="{Binding CommandResponseViewModel, Source={StaticResource Locator}}"  
+        mc:Ignorable="d"
+        SizeToContent="WidthAndHeight"
+        Title="Command Response Demonstration">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <GroupBox Header="Choose the type:" Margin="10,10,10,0">
+            <StackPanel Orientation="Vertical">
+                <RadioButton IsChecked="{Binding IsResponder, Mode=TwoWay}" Margin="20,5,0,0">Responder - will receive command and return a response</RadioButton>
+                <RadioButton IsChecked="{Binding IsCommander, Mode=TwoWay}" Margin="20,5,0,0">Commander - will send a command and receive a response</RadioButton>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Grid.Row="1" Margin="10" Header="Dashboard" >
+            <StackPanel>
+                <views:ResponderView Height="390" x:Name="ResponderView"  Visibility="{Binding DataContext.IsResponder, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <views:CommandView Height="390"  x:Name="CommandView" Visibility="{Binding DataContext.IsCommander, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Converter={StaticResource BooleanToVisibilityConverter} }"/>
+            </StackPanel>
+        </GroupBox>
+
+</Grid>
+</Window>
