@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using System.Reflection.Emit;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -99,19 +101,24 @@ namespace BluetoothXPlatformChat.WPF.Services
             string response = "ERR:TIMEOUT";
             using (var stream = _client.GetStream())
             {
-                StreamWriter writer = new StreamWriter(stream);
-                StreamReader reader = new StreamReader(stream);
-                //var buffer = Encoding.UTF8.GetBytes(command);
-                //await stream.WriteAsync(buffer, 0, buffer.Length);
-                //await stream.FlushAsync();
+                var buffer = Encoding.UTF8.GetBytes(command);
+                await stream.WriteAsync(buffer, 0, buffer.Length);
                 //stream.Close();
-                await writer.WriteAsync(command);
-                await writer.FlushAsync();
                 //writer.Close();
-                while (stream.DataAvailable)
+                Stopwatch stopWatch = new Stopwatch();
+                stopWatch.Start();
+                while (stopWatch.ElapsedMilliseconds < 5000)
                 {
-                    response += await reader.ReadToEndAsync();
+                    Thread.Sleep(1000);
+                    if (stream.DataAvailable)
+                    {
+                        var rawResponse = new byte[stream.Length];
+                        await stream.ReadAsync(rawResponse, 0, (int)stream.Length);
+                        response = System.Text.Encoding.ASCII.GetString(rawResponse);
+                        break;
+                    }
                 }
+                stopWatch.Stop();
             }
             return response;
         }
@@ -192,28 +199,50 @@ namespace BluetoothXPlatformChat.WPF.Services
                     // If we have a client see if there is new data
                     if (_client != null)
                     {
+                        Debug.WriteLine($"Client connected = true");
                         using (var stream = _client.GetStream())
-                        using (var reader = new StreamReader(stream))
-                        using (var writer = new StreamWriter(stream))
                         {
-                            try
+                            Debug.WriteLine($"Stream opened = {(stream != null)}");
+                            while (true)
                             {
-                                var command = await reader.ReadToEndAsync();
-                                if (!string.IsNullOrEmpty(command))
+                                if (token.IsCancellationRequested)
                                 {
-                                    BluetoothCommandResponseEventArgs args = new BluetoothCommandResponseEventArgs()
-                                    {
-                                        Command = command
-                                    };
-                                    OnCommandReceived(args);
-                                    // Now post the response
-                                    await writer.WriteAsync(args.Response);
-                                    await writer.FlushAsync();
+                                    return;
                                 }
-                            }
-                            catch (IOException)
-                            {
-                                break;
+
+                                if (stream.DataAvailable)
+                                {
+                                    Debug.WriteLine("Data Available");
+                                    string command;
+                                    using (StreamReader reader = new StreamReader(stream))
+                                    {
+                                        command = await reader.ReadToEndAsync();
+                                    }
+                                    //var rawData = new byte[stream.Length];
+                                    //await stream.ReadAsync(rawData, 0, (int)stream.Length);
+                                    //string command = System.Text.Encoding.ASCII.GetString(rawData);
+                                    if (!string.IsNullOrEmpty(command))
+                                    {
+                                        Debug.WriteLine($"Command received: {command}");
+                                        BluetoothCommandResponseEventArgs args = new BluetoothCommandResponseEventArgs()
+                                        {
+                                            Command = command
+                                        };
+                                        OnCommandReceived(args);
+                                        Debug.WriteLine($"Sending response: {args.Response}");
+                                        // Now post the response
+                                        using (StreamWriter writer = new StreamWriter(stream))
+                                        {
+                                            await writer.WriteLineAsync(args.Response);
+                                        }
+                                        //var buffer = Encoding.UTF8.GetBytes(args.Response);
+                                        //await stream.WriteAsync(buffer, 0, buffer.Length);
+                                    }
+                                }
+                                else
+                                {
+                                    Thread.Sleep(200);
+                                }
                             }
                         }
                     }
